@@ -115,7 +115,7 @@ def main():
     cv = np.zeros((Nhaloes,3))
     for i, halo_id in enumerate(halo_ids):
         print(1.0*i/Ngals)
-        evals, evecs = galaxy_shape(halo_id, basePath, snapNum, Lbox, reduced=True)
+        evals, evecs = halo_shape(halo_id, basePath, snapNum, Lbox, reduced=True)
         a[i] = evals[2]
         b[i] = evals[1]
         c[i] = evals[0]
