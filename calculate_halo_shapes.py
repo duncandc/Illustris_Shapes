@@ -86,7 +86,7 @@ def main():
     basePath = '/Volumes/G-RAID/simulations/unprocessed/Illustris/Illustris-1'
     snapNum = 135
     m_dm = 6.3*10**6.0 #dark matter particle mass
-    litte_h = 0.704
+    little_h = 0.704
     Lbox = np.array([75.0]*3)
 
     # make selection
@@ -95,7 +95,7 @@ def main():
     gal_ids = np.arange(0,len(x['SubhaloGrNr']))
     gal_stellar_mass = x['SubhaloMassInRadType'][:,4] # mass within 2*R_half
 
-    mask = np.log10(gal_stellar_mass*10**(10)/litte_h)>=9.0
+    mask = np.log10(gal_stellar_mass*10**(10)/little_h)>=9.0
 
     gal_ids = gal_ids[mask]
     Ngals = len(gal_ids)
