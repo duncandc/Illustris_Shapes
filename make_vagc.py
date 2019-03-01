@@ -111,8 +111,8 @@ def main():
     # save catalog
     fpath = './data/'
     fname = 'illustris_shapes_vagc_1.hdf5'
-    catalog_table.write(fname, path='data', overwrite=True)
-    
+    t.write(fname, path='data', overwrite=True)
+
 
 if __name__ == '__main__':
     main()
