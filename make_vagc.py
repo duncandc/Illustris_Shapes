@@ -33,7 +33,7 @@ def main():
     import h5py
     f = h5py.File(basePath + '/snapdir_135/stellar_circs.hdf5', 'r')
     circ_data = f.get('Snapshot_135')
-    f_disk = np.arrayt(circ_data['CircAbove07Frac'].value)
+    f_disk = np.array(circ_data['CircAbove07Frac'].value)
     f_bulge = 1.0-f_disk
 
     gal_ids = t_1['gal_id']
