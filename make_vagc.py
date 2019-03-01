@@ -103,10 +103,10 @@ def main():
 
 
     t['halo_b_to_a'] = -99
-    t['halo_b_to_a'][centrals_mask] = t_2['b'][halo_mask]/t_1['a'][halo_mask]
+    t['halo_b_to_a'][centrals_mask] = t_2['b'][halo_mask]/t_2['a'][halo_mask]
     
     t['halo_c_to_a'] = -99
-    t['halo_c_to_a'][centrals_mask] = t_2['c'][halo_mask]/t_1['a'][halo_mask]
+    t['halo_c_to_a'][centrals_mask] = t_2['c'][halo_mask]/t_2['a'][halo_mask]
 
 
     print(t)
