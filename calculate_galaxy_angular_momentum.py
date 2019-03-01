@@ -133,7 +133,7 @@ def main():
     cv = np.zeros((Ngals,3))
     for i, gal_id in enumerate(gal_ids):
         print(1.0*i/Ngals)
-        m, vec = galaxy_shape(gal_id, basePath, snapNum, Lbox, reduced=True)
+        m, vec = galaxy_ang_mom(gal_id, basePath, snapNum, Lbox, reduced=True)
         L[i] = m
         Lx[i,:] = vec[0]
         Ly[i,:] = vec[1]
