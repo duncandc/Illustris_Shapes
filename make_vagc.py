@@ -42,12 +42,74 @@ def main():
     galaxy_positions = galaxy_positions[gal_ids]
 
     t = Table([gal_ids],names=['gal_ids'])
+    
     t['central'] = 0
     t['central'][centrals_mask] = 1
 
-    print(t)
-    
+    t['host_halo_id'] = host_ids
 
+    t['x'] = galaxy_positions[:,0]
+    t['y'] = galaxy_positions[:,1]
+    t['z'] = galaxy_positions[:,2]
+
+    t['galaxy_axisA_x'] = t_1['av_x']
+    t['galaxy_axisA_y'] = t_1['av_y']
+    t['galaxy_axisA_z'] = t_1['av_z']
+
+    t['galaxy_axisB_x'] = t_1['bv_x']
+    t['galaxy_axisB_y'] = t_1['bv_y']
+    t['galaxy_axisB_z'] = t_1['bv_z']
+
+    t['galaxy_axisC_x'] = t_1['cv_x']
+    t['galaxy_axisC_y'] = t_1['cv_y']
+    t['galaxy_axisC_z'] = t_1['cv_z']
+
+    t['galaxy_b_to_a'] = t_1['b']/t_1['a']
+    t['galaxy_c_to_a'] = t_1['c']/t_1['a']
+
+    # some halo properties
+    host_halo_sizes = loadHalos(basePath, snapNum, fields=['Group_R_Mean200'])/1000.0
+    host_halo_sizes = host_halo_sizes[host_ids]
+
+    host_halo_m200 = loadHalos(basePath, snapNum, fields=['Group_M_Mean200'])*10**10
+    host_halo_m200 = host_halo_m200[host_ids]
+
+    t['host_halo_m200b'] = host_halo_sizes
+    t['host_halo_r200b'] = host_halo_m200
+
+    # halo shapes
+    halo_mask = np.in1d(t_2['halo_id'], host_ids[centrals_mask])
+    
+    t['halo_axisA_x'] = -99
+    t['halo_axisA_x'][centrals] = t_2['av_x'][halo_mask]
+    t['halo_axisA_y'] = -99
+    t['halo_axisA_y'][centrals] = t_2['av_y'][halo_mask]
+    t['halo_axisA_z'] = -99
+    t['halo_axisA_z'][centrals] = t_2['av_z'][halo_mask]
+
+    t['halo_axisB_x'] = -99
+    t['halo_axisB_x'][centrals] = t_2['bv_x'][halo_mask]
+    t['halo_axisB_y'] = -99
+    t['halo_axisB_y'][centrals] = t_2['bv_y'][halo_mask]
+    t['halo_axisB_z'] = -99
+    t['halo_axisB_z'][centrals] = t_2['bv_z'][halo_mask]
+
+    t['halo_axisC_x'] = -99
+    t['halo_axisC_x'][centrals] = t_2['cv_x'][halo_mask]
+    t['halo_axisC_y'] = -99
+    t['halo_axisC_y'][centrals] = t_2['cv_y'][halo_mask]
+    t['halo_axisC_z'] = -99
+    t['halo_axisC_z'][centrals] = t_2['cv_z'][halo_mask]
+
+
+    t['halo_b_to_a'] = = -99
+    t['halo_b_to_a'][centrals] = t_2['b'][halo_mask]/t_1['a'][halo_mask]
+    
+    t['halo_c_to_a'] = = -99
+    t['halo_c_to_a'][centrals] = t_2['c'][halo_mask]/t_1['a'][halo_mask]
+
+
+    print(t)
 
 if __name__ == '__main__':
     main()
