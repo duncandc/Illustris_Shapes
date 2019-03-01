@@ -108,8 +108,11 @@ def main():
     t['halo_c_to_a'] = -99.0
     t['halo_c_to_a'][centrals_mask] = t_2['c'][halo_mask]/t_2['a'][halo_mask]
 
-
-    print(t)
+    # save catalog
+    fpath = './data/'
+    fname = 'illustris_shapes_vagc_1.hdf5'
+    catalog_table.write(fname, path='data', overwrite=True)
+    
 
 if __name__ == '__main__':
     main()
