@@ -125,12 +125,10 @@ def main():
     Ngals = len(gal_ids)
     print("number of galaxies in selection: {0}".format(Ngals))
 
-    a = np.zeros(Ngals)
-    b = np.zeros(Ngals)
-    c = np.zeros(Ngals)
-    av = np.zeros((Ngals,3))
-    bv = np.zeros((Ngals,3))
-    cv = np.zeros((Ngals,3))
+    L = np.zeros(Ngals)
+    Lx = np.zeros(Ngals)
+    Ly = np.zeros(Ngals)
+    Lz = np.zeros(Ngals)
     for i, gal_id in enumerate(gal_ids):
         print(1.0*i/Ngals)
         m, vec = galaxy_ang_mom(gal_id, basePath, snapNum, Lbox, reduced=True)
