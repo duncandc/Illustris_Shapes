@@ -33,7 +33,8 @@ def main():
     import h5py
     f = h5py.File(basePath + '/snapdir_135/stellar_circs.hdf5', 'r')
     circ_data = f.get('Snapshot_135')
-    f_bulge = 1.0 - circ_data['CircAbove07Frac']
+    f_disk = np.arrayt(circ_data['CircAbove07Frac'].value)
+    f_bulge = 1.0-f_disk
 
     gal_ids = t_1['gal_id']
 
@@ -73,9 +74,9 @@ def main():
     t['galaxy_c_to_a'] = t_1['c']/t_1['a']
 
     from halotools.utils import crossmatch
-    idx, idy = crossmatch(t['gal_ids'], circ_data['SubfindID'])
+    idx, idy = crossmatch(t['gal_ids'], circ_data['SubfindID'].value)
     t['galaxy_f_bulge'] = -99.0
-    t['galaxy_f_bulge'][idx] = 1.0 - f_bulge[idy]
+    t['galaxy_f_bulge'][idx] = f_bulge[idy]
 
     # some halo properties
     host_halo_sizes = loadHalos(basePath, snapNum, fields=['Group_R_Mean200'])/1000.0
