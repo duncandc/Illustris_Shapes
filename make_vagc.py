@@ -108,10 +108,12 @@ def main():
     t['halo_c_to_a'] = -99.0
     t['halo_c_to_a'][centrals_mask] = t_2['c'][halo_mask]/t_2['a'][halo_mask]
 
+    print(t)
+
     # save catalog
     fpath = './data/'
-    fname = 'illustris_shapes_vagc_1.hdf5'
-    t.write(fname, path='data', overwrite=True)
+    fname = 'illustris_shapes_vagc_1.dat'
+    t.write(fname, format='ascii', overwrite=True)
 
 
 if __name__ == '__main__':
