@@ -81,32 +81,32 @@ def main():
     halo_mask = np.in1d(t_2['halo_id'], host_ids[centrals_mask])
     
     t['halo_axisA_x'] = -99
-    t['halo_axisA_x'][centrals] = t_2['av_x'][halo_mask]
+    t['halo_axisA_x'][centrals_mask] = t_2['av_x'][halo_mask]
     t['halo_axisA_y'] = -99
-    t['halo_axisA_y'][centrals] = t_2['av_y'][halo_mask]
+    t['halo_axisA_y'][centrals_mask] = t_2['av_y'][halo_mask]
     t['halo_axisA_z'] = -99
-    t['halo_axisA_z'][centrals] = t_2['av_z'][halo_mask]
+    t['halo_axisA_z'][centrals_mask] = t_2['av_z'][halo_mask]
 
     t['halo_axisB_x'] = -99
-    t['halo_axisB_x'][centrals] = t_2['bv_x'][halo_mask]
+    t['halo_axisB_x'][centrals_mask] = t_2['bv_x'][halo_mask]
     t['halo_axisB_y'] = -99
-    t['halo_axisB_y'][centrals] = t_2['bv_y'][halo_mask]
+    t['halo_axisB_y'][centrals_mask] = t_2['bv_y'][halo_mask]
     t['halo_axisB_z'] = -99
-    t['halo_axisB_z'][centrals] = t_2['bv_z'][halo_mask]
+    t['halo_axisB_z'][centrals_mask] = t_2['bv_z'][halo_mask]
 
     t['halo_axisC_x'] = -99
-    t['halo_axisC_x'][centrals] = t_2['cv_x'][halo_mask]
+    t['halo_axisC_x'][centrals_mask] = t_2['cv_x'][halo_mask]
     t['halo_axisC_y'] = -99
-    t['halo_axisC_y'][centrals] = t_2['cv_y'][halo_mask]
+    t['halo_axisC_y'][centrals_mask] = t_2['cv_y'][halo_mask]
     t['halo_axisC_z'] = -99
-    t['halo_axisC_z'][centrals] = t_2['cv_z'][halo_mask]
+    t['halo_axisC_z'][centrals_mask] = t_2['cv_z'][halo_mask]
 
 
     t['halo_b_to_a'] = -99
-    t['halo_b_to_a'][centrals] = t_2['b'][halo_mask]/t_1['a'][halo_mask]
+    t['halo_b_to_a'][centrals_mask] = t_2['b'][halo_mask]/t_1['a'][halo_mask]
     
     t['halo_c_to_a'] = -99
-    t['halo_c_to_a'][centrals] = t_2['c'][halo_mask]/t_1['a'][halo_mask]
+    t['halo_c_to_a'][centrals_mask] = t_2['c'][halo_mask]/t_1['a'][halo_mask]
 
 
     print(t)
