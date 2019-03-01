@@ -30,6 +30,10 @@ def main():
     t_1 = Table.read('./data/galaxy_shapes_1.dat', format='ascii')
     t_2 = Table.read('./data/halo_shapes_1.dat', format='ascii')
 
+    import h5py
+    f = h5py.File(basePath + '/snapdir_135/stellar_circs.hdf5', 'r')
+    circ_data = f.get('Snapshot_135')
+
     gal_ids = t_1['gal_id']
 
     central_ids = loadHalos(basePath, snapNum, fields=['GroupFirstSub'])  
@@ -66,6 +70,11 @@ def main():
 
     t['galaxy_b_to_a'] = t_1['b']/t_1['a']
     t['galaxy_c_to_a'] = t_1['c']/t_1['a']
+
+    from halotools.utils import crossmatch
+    idx, idy = crossmatch(t['gal_ids'], circ_data['SubfindID'])
+    t['galaxy_f_bulge'] = -99.0
+    t['galaxy_f_bulge'][idx] = 1.0 - circ_data['CircAbove07Frac'][idy]
 
     # some halo properties
     host_halo_sizes = loadHalos(basePath, snapNum, fields=['Group_R_Mean200'])/1000.0
@@ -113,7 +122,7 @@ def main():
     # save catalog
     fpath = './data/'
     fname = 'illustris_shapes_vagc_1.dat'
-    t.write(fname, format='ascii', overwrite=True)
+    t.write(fpath + fname, format='ascii', overwrite=True)
 
 
 if __name__ == '__main__':
