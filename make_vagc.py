@@ -41,7 +41,7 @@ def main():
     galaxy_positions = loadSubhalos(basePath, snapNum, fields=['SubhaloPos'])/1000.0
     galaxy_positions = galaxy_positions[gal_ids]
 
-    t = Table()
+    t = Table([gal_ids],names=['gal_ids'])
     t['central'] = 0
     t['central'][centrals_mask] = 1
 
