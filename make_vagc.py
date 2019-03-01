@@ -13,8 +13,8 @@ from illustris_python.snapshot import loadHalo, snapPath, loadSubhalo
 from illustris_python.groupcat import gcPath, loadHalos, loadSubhalos
 
 def main():
-
-	basePath = '/Volumes/G-RAID/simulations/unprocessed/Illustris/Illustris-1'
+    
+    basePath = '/Volumes/G-RAID/simulations/unprocessed/Illustris/Illustris-1'
     snapNum = 135
     m_dm = 6.3*10**6.0 #dark matter particle mass
     little_h = 0.704
