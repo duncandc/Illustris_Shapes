@@ -133,6 +133,7 @@ def main():
         print(1.0*i/Ngals)
         m, vec = galaxy_ang_mom(gal_id, basePath, snapNum, Lbox, reduced=True)
         L[i] = m
+        print(m, vec)
         Lx[i,:] = vec[0]
         Ly[i,:] = vec[1]
         Lz[i,:] = vec[2]
