@@ -142,7 +142,7 @@ def main():
     # save measurements
     fpath = './data/'
     fname = 'galaxy_angular_momentum.dat'
-    ascii.write([gal_ids, L, Lx, Ly, Lz]
+    ascii.write([gal_ids, L, Lx, Ly, Lz],
                 fpath+fname,
                 names=['gal_id', 'L', 'Lx', 'Ly','Lz'],
                 overwrite=True)
