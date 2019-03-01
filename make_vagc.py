@@ -33,6 +33,8 @@ def main():
     import h5py
     f = h5py.File(basePath + '/snapdir_135/stellar_circs.hdf5', 'r')
     circ_data = f.get('Snapshot_135')
+    circ_data = np.arrayt(circ_data)
+    print(circ_data)
 
     gal_ids = t_1['gal_id']
 
