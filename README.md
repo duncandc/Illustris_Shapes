@@ -1,5 +1,7 @@
 # Illustris Galaxy Shapes
-A project to measure galaxy and halko shapes/orientations in the Illustris Simulations.
+
+This is a project to measure galaxy and halo shapes/orientations in the Illustris Simulations.
+
 
 ## Requirements
 
@@ -13,7 +15,7 @@ This project requires the following Python packages installed:
 
 ## Data
 
-This project uses a large amount of particle data available on the Illustris data access webpage.
+This project uses a large amount of particle data available on the Illustris data access webpage.  Scripts to effeciently download the required data are availabel in the `./data` directory.
 
 The data products created by this project are stored in the `./data` directory.
 
