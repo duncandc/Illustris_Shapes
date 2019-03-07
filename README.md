@@ -15,12 +15,25 @@ This project requires the following Python packages installed:
 
 ## Galaxy & Halo Shapes
 
+Currently, I calculate galaxy and halo shapes for the following simulations:
+
+* Illustris-1
+	* z=0.0 (snapshot 135)
+	* z=0.6 (snapshot 099)
+	* z=1.0 (snapshot 085)
+* Illustris-1-Dark
+	* z=0.0 (snapshot 135)
+	* z=0.6 (snapshot 099)
+	* z=1.0 (snapshot 085)
+
+Galaxy shapes are calculated using stellar particles (excluding wind particles) that are within two times the stellar half mass radius.  The center of galaxies is taken to be the most bound particle in the subfind subhalo, regardless of particle type.
+
 Galaxy and halo shapes/orientations are calculated using the following scripts:
 
 * `calculate_galaxy_shapes.py`
 * `calculate_halo_shapes.py`
 
-Each of these can be run to create a shape catalog for a given simulation, snapshot, and shape calculation method.  For example, to calculate galaxy shapes for the Illustris-1 simulation at z=0 (snapshot 135) using the reduced inertia tensor method, you would execute the following command:
+Each of these scripts can be run to create a shape catalog for a given simulation, snapshot, and shape calculation method.  For example, to calculate galaxy shapes for the Illustris-1 simulation at z=0 (snapshot 135) using the reduced inertia tensor method, you would execute the following command:
 
 ```
 $user: python calculate_galaxy_shapes.py Illustris-1 135 reduced
