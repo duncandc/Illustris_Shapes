@@ -11,7 +11,7 @@ import sys
 
 from illustris_python.snapshot import loadHalo, snapPath, loadSubhalo
 from illustris_python.groupcat import gcPath, loadHalos, loadSubhalos
-from inertia_tensors import inertia_tensors, reduced_inertia_tensors, iterative_inertia_tensors
+from inertia_tensors import inertia_tensors, reduced_inertia_tensors, iterative_inertia_tensors_3D
 
 from simulation_props import sim_prop_dict
 
@@ -141,7 +141,7 @@ def galaxy_shape(gal_id, basePath, snapNum, Lbox, shape_type='reduced'):
     elif shape_type == 'non-reduced':
         I = inertia_tensors(ptcl_coords[ptcl_mask], ptcl_masses[ptcl_mask])
     elif shape_type == 'iterative':
-        I = iterative_inertia_tensors(ptcl_coords[ptcl_mask], ptcl_masses[ptcl_mask], rtol=0.01, niter_max=10)
+        I = iterative_inertia_tensors_3D(ptcl_coords[ptcl_mask], ptcl_masses[ptcl_mask], rtol=0.01, niter_max=10)
     else:
         msg = ('tensor calculation type not recognized.')
         raise ValueError(msg)
@@ -209,7 +209,7 @@ def main():
     cv = np.zeros((Ngals,3))
 
     # loop over the list of galaxy IDs
-    for i, gal_id in enumerate(gal_ids[:100]):
+    for i, gal_id in enumerate(gal_ids):
         evals, evecs = galaxy_shape(gal_id, basePath, snapNum, Lbox, shape_type=shape_type)
         a[i] = evals[2]
         b[i] = evals[1]
@@ -221,7 +221,7 @@ def main():
         print("{0:.2f} % of galaxies remaining...".format(percent_remaining))
 
     # save measurements
-    fpath = './data/'
+    fpath = './data/shape_catalogs/'
     fname = sim_name + '_' + str(snapNum) + '_'+ shape_type +'_galaxy_shapes.dat'
     ascii.write([gal_ids, a, b, c,
                  av[:,0], av[:,1], av[:,2],
@@ -233,10 +233,6 @@ def main():
                        'bv_x', 'bv_y','bv_z',
                        'cv_x', 'cv_y','cv_z'],
                 overwrite=True)
-
-
-
-
 
 
 if __name__ == '__main__':
