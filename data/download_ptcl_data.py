@@ -50,13 +50,16 @@ def main():
     n_snaps = sim_metadata['num_files_snapshot']
     for i in range(start_file_num, n_snaps):
         inner_start = time.time()
+
         file_url = base_url + "files/snapshot-"+str(snapnum).zfill(3)+"." + str(i) + ".hdf5"
         saved_filename = get(file_url, params, savepath)
+
         dt = time.time()-inner_start
         n_remaining = n_snaps-i-1  # number of files left to download
         print(i, "estimated time remaining: {0} hours".format(n_remaining*dt/60.0/60.0))
+
     print("     ")
-    print("total time ellapsed: {0} hours".format(time.time()-outer_start/60.0/60.0))
+    print("total time ellapsed: {0} hours".format(time.time()/60.0/60.0-outer_start/60.0/60.0))
 
 
 if __name__ == '__main__':
