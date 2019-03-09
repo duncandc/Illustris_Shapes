@@ -67,7 +67,7 @@ def format_particles(center, coords, Lbox):
     return coords
 
 
-def particle_selection(gal_id, ptcl_coords, basePath, snapNum):
+def particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True):
     """
     Apply the selection criteria to galaxy particles
 
@@ -87,7 +87,10 @@ def particle_selection(gal_id, ptcl_coords, basePath, snapNum):
 
     # use only particles within 2 * R_half
     r = np.sqrt(np.sum(ptcl_coords**2, axis=1))/gal_rhalf
-    radial_mask = (r<=2.0)
+    if radial_mask:
+        radial_mask = (r<=2.0)
+    else:
+        radial_mask = np.array([True]*len(star_mask))
 
     return (radial_mask) & (star_mask)
 
@@ -134,7 +137,10 @@ def galaxy_shape(gal_id, basePath, snapNum, Lbox, shape_type='reduced'):
     ptcl_coords = format_particles(gal_position, ptcl_coords, Lbox)
 
     # make a selection cut on the particles
-    ptcl_mask = particle_selection(gal_id, ptcl_coords, basePath, snapNum)
+    if shape_type=='non-reduced':
+        ptcl_mask = particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True)
+    else:
+        ptcl_mask = particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True)
 
     if shape_type == 'reduced':
         I = reduced_inertia_tensors(ptcl_coords[ptcl_mask], ptcl_masses[ptcl_mask])
@@ -214,9 +220,9 @@ def main():
         a[i] = evals[2]
         b[i] = evals[1]
         c[i] = evals[0]
-        av[i,:] = evecs[2]
-        bv[i,:] = evecs[1]
-        cv[i,:] = evecs[0]
+        av[i,:] = evecs[:,2]
+        bv[i,:] = evecs[:,1]
+        cv[i,:] = evecs[:,0]
         percent_remaining = (1.0-1.0*i/Ngals)*100
         print("{0:.2f} % of galaxies remaining...".format(percent_remaining))
 
