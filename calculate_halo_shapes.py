@@ -11,10 +11,75 @@ import sys
 
 from illustris_python.snapshot import loadHalo, snapPath, loadSubhalo
 from illustris_python.groupcat import gcPath, loadHalos, loadSubhalos
-from inertia_tensors import inertia_tensors, reduced_inertia_tensors
+from inertia_tensors import inertia_tensors, reduced_inertia_tensors, iterative_inertia_tensors_3D
+
+from simulation_props import sim_prop_dict
 
 
-def halo_shape(halo_id, basePath, snapNum, Lbox, reduced=True, central_sub_only=False):
+def format_particles(center, coords, Lbox):
+    """
+    center the partivcle coordinates on (0,0,0) and account for PBCs
+
+    Parameters
+    ----------
+    center : array_like
+        array of shape (3,) storing the coordinates of the
+        center of the particle distribution
+
+    coords :  array_like
+        array of shape (nptcls, 3) storing the coordinates of the
+        particles
+
+    Lbox : array_like
+        length 3-array giving the box size in each dimension
+
+    Returns
+    -------
+    coords : numpy.array
+        array of shape (nptcls, 3) storing the centered particle coordinates
+    """
+
+    dx = coords[:,0] - center[0]
+    dy = coords[:,1] - center[1]
+    dz = coords[:,2] - center[2]
+
+    # x-coordinate
+    mask = (dx > Lbox[0]/2.0)
+    dx[mask] = dx[mask] - Lbox[0]
+    mask = (dx < -Lbox[0]/2.0)
+    dx[mask] = dx[mask] + Lbox[0]
+
+    # y-coordinate
+    mask = (dy > Lbox[1]/2.0)
+    dy[mask] = dy[mask] - Lbox[1]
+    mask = (dy < -Lbox[1]/2.0)
+    dy[mask] = dy[mask] + Lbox[1]
+
+    # z-coordinate
+    mask = (dz > Lbox[2]/2.0)
+    dz[mask] = dz[mask] - Lbox[2]
+    mask = (dz < -Lbox[2]/2.0)
+    dz[mask] = dz[mask] + Lbox[2]
+
+    # format coordinates
+    coords = np.vstack((dx,dy,dz)).T
+
+    return coords
+
+
+def halo_center(halo_id, basePath, snapNum):
+    """
+    Return the coordinates of the center of the galaxy
+    """
+
+    # load position of the most bound particle (of any type)
+    coords = loadSubhalos(basePath, snapNum, fields=['SubhaloPos'])/1000.0
+    coord = coords[halo_id]
+
+    return coord
+
+
+def halo_shape(halo_id, basePath, snapNum, Lbox, shape_type='reduced'):
     """
     Parameters
     ----------
@@ -26,54 +91,31 @@ def halo_shape(halo_id, basePath, snapNum, Lbox, reduced=True, central_sub_only=
 
     Lbox : array_like
 
-    reduced : bool
+    shape_type : string
 
     Returns
     -------
     eig_vals, eig_vecs
     """
 
-    # load 'central' subhaloes
-    central_ids = loadHalos(basePath, snapNum, fields=['GroupFirstSub'])
-    subhalo_id = central_ids[halo_id]
+    # choose a 'center' for each galaxy
+    halo_position = halo_center(halo_id, basePath, snapNum)
 
-    # load halo position
-    halo_positions = loadSubhalos(basePath, snapNum, fields=['SubhaloPos'])/1000.0
-    halo_position = halo_positions[subhalo_id]
+    # load stellar particle positions and masses
+    ptcl_coords = loadSubhalo(basePath, snapNum, halo_id, 1, fields=['Coordinates'])/1000.0
 
-    # load particles
-    if central_sub_only:
-        ptcl_coords = loadSubhalo(basePath, snapNum, subhalo_id, 1, fields=['Coordinates'])/1000.0
+    # center and account for PBCs
+    ptcl_coords = format_particles(halo_position, ptcl_coords, Lbox)
+
+    if shape_type == 'reduced':
+        I = reduced_inertia_tensors(ptcl_coords)
+    elif shape_type == 'non-reduced':
+        I = inertia_tensors(ptcl_coords)
+    elif shape_type == 'iterative':
+        I = iterative_inertia_tensors_3D(ptcl_coords, rtol=0.01, niter_max=10)
     else:
-        ptcl_coords = loadHalo(basePath, snapNum, halo_id, 1, fields=['Coordinates'])/1000.0
-
-    # load halo size
-    #halo_sizes = loadHalos(basePath, snapNum, fields=['Group_R_Mean200'])/1000.0
-    #halo_size = halo_sizes[halo_id]
-
-    # account for PBCs
-    dx = ptcl_coords[:,0] - halo_position[0]
-    dy = ptcl_coords[:,1] - halo_position[1]
-    dz = ptcl_coords[:,2] - halo_position[2]
-
-    mask = (dx > Lbox[0]/2.0)
-    dx[mask] = dx[mask] - Lbox[0]
-    mask = (dx < -Lbox[0]/2.0)
-    dx[mask] = dx[mask] + Lbox[0]
-
-    mask = (dy > Lbox[1]/2.0)
-    dy[mask] = dy[mask] - Lbox[1]
-    mask = (dy < -Lbox[1]/2.0)
-    dy[mask] = dy[mask] + Lbox[1]
-
-    mask = (dz > Lbox[2]/2.0)
-    dz[mask] = dz[mask] - Lbox[2]
-    mask = (dz < -Lbox[2]/2.0)
-    dz[mask] = dz[mask] + Lbox[2]
-
-    ptcl_coords = np.vstack((dx,dy,dz)).T
-
-    I = reduced_inertia_tensors(ptcl_coords)
+        msg = ('tensor calculation type not recognized.')
+        raise ValueError(msg)
 
     evals, evecs = np.linalg.eigh(I)
     evals = np.sqrt(evals)
@@ -81,52 +123,75 @@ def halo_shape(halo_id, basePath, snapNum, Lbox, reduced=True, central_sub_only=
     return evals[0], evecs[0]
 
 
-def main():
-
-    basePath = '/Volumes/G-RAID/simulations/unprocessed/Illustris/Illustris-1'
-    snapNum = 135
-    m_dm = 6.3*10**6.0 #dark matter particle mass
-    little_h = 0.704
-    Lbox = np.array([75.0]*3)
+def halo_selection(min_num_ptcls, basePath, snapNum):
+    """
+    make a cut on number of dm particles
+    """
 
     # make selection
-    x = loadSubhalos(basePath, snapNum)
+    halo_table = loadSubhalos(basePath, snapNum, fields=['SubhaloGrNr', 'SubhaloLenType'])
 
-    gal_ids = np.arange(0,len(x['SubhaloGrNr']))
-    gal_stellar_mass = x['SubhaloMassInRadType'][:,4] # mass within 2*R_half
+    halo_ids = np.arange(0,len(halo_table['SubhaloGrNr']))
 
-    mask = np.log10(gal_stellar_mass*10**(10)/little_h)>=9.0
+    # mass of stellar particles within 2*R_half
+    mask = halo_table['SubhaloLenType'][:,1] >= min_num_ptcls
 
-    gal_ids = gal_ids[mask]
-    Ngals = len(gal_ids)
-    print("number of galaxies in selection: {0}".format(Ngals))
+    return mask, halo_ids[mask]
 
-    host_ids = loadSubhalos(basePath, snapNum, fields=['SubhaloGrNr'])
-    host_ids = host_ids[gal_ids]
-    halo_ids = np.unique(host_ids)
 
+
+def main():
+
+    if len(sys.argv)>1:
+        sim_name = sys.argv[1]
+        snapNum = int(sys.argv[2])
+        shape_type = sys.argv[3]
+    else:
+        sim_name = 'Illustris-1' # full physics high-res run
+        snapNum = 135  # z=0
+        shape_type = 'reduced'  # non-reduced, reduced, iterative
+
+    # get simulation properties
+    d = sim_prop_dict[sim_name]
+    basePath = d['basePath']
+    m_dm = d['m_dm']
+    litte_h = d['litte_h']
+    Lbox = d['Lbox']
+
+    # make galaxy selection
+    min_num_ptcls = 1000
+    mask, halo_ids = halo_selection(min_num_ptcls, basePath, snapNum)
+
+    # number of galaxies in selection
     Nhaloes = len(halo_ids)
+    print("number of haloes in selection: {0}".format(Nhaloes))
 
+    # create array to store shape properties
+    # eigen values
     a = np.zeros(Nhaloes)
     b = np.zeros(Nhaloes)
     c = np.zeros(Nhaloes)
+    # eigen vectors
     av = np.zeros((Nhaloes,3))
     bv = np.zeros((Nhaloes,3))
     cv = np.zeros((Nhaloes,3))
+
+    # loop over the list of galaxy IDs
     for i, halo_id in enumerate(halo_ids):
-        print(1.0*i/Nhaloes)
-        evals, evecs = halo_shape(halo_id, basePath, snapNum, Lbox, reduced=True)
+        evals, evecs = halo_shape(halo_id, basePath, snapNum, Lbox, shape_type=shape_type)
         a[i] = evals[2]
         b[i] = evals[1]
         c[i] = evals[0]
-        av[i,:] = evecs[2]
-        bv[i,:] = evecs[1]
-        cv[i,:] = evecs[0]
+        av[i,:] = evecs[:,2]
+        bv[i,:] = evecs[:,1]
+        cv[i,:] = evecs[:,0]
+        percent_remaining = (1.0-1.0*i/Nhaloes)*100
+        print("{0:.2f} % of haloes remaining...".format(percent_remaining))
 
     # save measurements
-    fpath = './data/'
-    fname = 'halo_shapes_1.dat'
-    ascii.write([halo_ids, a, b, c,
+    fpath = './data/shape_catalogs/'
+    fname = sim_name + '_' + str(snapNum) + '_'+ shape_type +'_halo_shapes.dat'
+    ascii.write([gal_ids, a, b, c,
                  av[:,0], av[:,1], av[:,2],
                  bv[:,0], bv[:,1], bv[:,2],
                  cv[:,0], cv[:,1], cv[:,2]],
@@ -136,9 +201,6 @@ def main():
                        'bv_x', 'bv_y','bv_z',
                        'cv_x', 'cv_y','cv_z'],
                 overwrite=True)
-
-
-
 
 
 

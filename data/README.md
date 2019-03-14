@@ -28,6 +28,10 @@ All particle data sets used in this project can be downloaded by running the `do
 Halo catalogs are downloaded in their entirety.  
 
 
+### Genel et al. (2015) Shape Catalog
+
+There is a publicaly available shape catalog for Illustris-1 from [Genel et al. (2015)](http://adsabs.harvard.edu/abs/2015arXiv150301117G) described [here](http://www.illustris-project.org/data/docs/specifications/#sec4c).  This only includes the eigenvalues and not the eigenveectors, i.e. no orientations.  I have also confirmed that both the `MassTensorEigenVals` and `ReducedMassTensorEigenVals` use the same eigenvectors in the calculation, so there is a slight descrepancy between my calculation of the reduced mass tensor eigenvalues and those in the Genel catalog (private communication).
+
 ## Notes
 
 checksums can be run on the data on Macs using the default shasum program by executing the following command in the directoruy storing the files.  
