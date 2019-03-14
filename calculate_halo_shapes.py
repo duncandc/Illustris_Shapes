@@ -191,7 +191,7 @@ def main():
     # save measurements
     fpath = './data/shape_catalogs/'
     fname = sim_name + '_' + str(snapNum) + '_'+ shape_type +'_halo_shapes.dat'
-    ascii.write([gal_ids, a, b, c,
+    ascii.write([halo_ids, a, b, c,
                  av[:,0], av[:,1], av[:,2],
                  bv[:,0], bv[:,1], bv[:,2],
                  cv[:,0], cv[:,1], cv[:,2]],
