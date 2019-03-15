@@ -27,9 +27,9 @@ Currently, I calculate galaxy and halo shapes for the following simulations:
 	* z=0.6 (snapshot 099)
 	* z=1.0 (snapshot 085)
 
-Galaxy shapes are calculated for galaixes with a stellar mass within two times the stellar half mass radius of at least log(Mstar)>= 9 + log(h), using all stellar particles (excluding wind particles) that are within two times the stellar half mass radius.  The center of galaxies is taken to be the most bound particle in the subfind subhalo, regardless of particle type.
+Galaxy shapes are calculated for galaxies with a stellar mass within two times the stellar half-mass radius of at least log(Mstar)>= 9 + log(h), using all stellar particles (excluding wind particles) that are within two times the stellar half-mass radius.  The center of a galaxy is taken to be the most bound particle within the subfind subhalo, regardless of particle type.
 
-(Sub-)halo shapes are calculated using all dark matter particles that belong to a subfind 'subhalo' with at least 1000 particles.  The center of (sub-)haloes is taken to be the most bound particle in the subfind subhalo, regardless of particle type.  Note that subfind sub-haloes exclude particles that belong to substructures, i.e. central subhaloes do not incluide particles from satellite subhaloes.  
+(Sub-)halo shapes are calculated using all dark matter particles that belong to a subfind 'subhalo' with at least 1000 particles.  The center of (sub-)haloes is taken to be the most bound particle in the subfind subhalo, regardless of particle type.  Note that subfind sub-haloes exclude particles that belong to substructures, i.e. central subhaloes do not include particles from satellite subhaloes.  
 
 Galaxy and halo shapes/orientations are calculated using the following scripts:
 
@@ -51,7 +51,7 @@ Note that in order to run these scripts, you must have the required particle dat
 
 ## Data
 
-This project uses a large amount of particle data available on the Illustris data access webpage.  Scripts to effeciently download the required data are availabel in the `./data` directory.
+This project uses a large amount of particle data available on the Illustris data access webpage.  Scripts to efficiently download the required data are available in the `./data` directory.
 
 The data products created by this project are stored in the `./data` directory. 
 
