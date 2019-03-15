@@ -2,6 +2,7 @@
 
 This is a project to measure galaxy and halo shapes/orientations in the Illustris Simulations.
 
+![](./notebooks/figures/demo_shapes.png)
 
 ## Requirements
 
