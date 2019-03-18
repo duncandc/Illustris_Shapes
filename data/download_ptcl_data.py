@@ -29,11 +29,17 @@ def main():
     else:
         dm_only=False
 
-    base_url = "http://www.illustris-project.org/api/" + sim + "/"
+    if sim[:3] == 'TNG':
+        base_url = "http://www.illustris-project.org/api/" + sim + "/output/" 
+    else:
+        base_url = "http://www.illustris-project.org/api/" + sim + "/"
     snapnum = snapnum.zfill(3)
 
     # location to save data
-    savepath = base_savepath + sim + "/" + "snapdir_" + snapnum + "/"
+    if sim[:3] == 'TNG':
+        savepath = base_savepath + sim + "/output/" + "snapdir_" + snapnum + "/"
+    else:
+        savepath = base_savepath + sim + "/" + "snapdir_" + snapnum + "/"
     print("saving files to: "+savepath)
     print("     ")
 
