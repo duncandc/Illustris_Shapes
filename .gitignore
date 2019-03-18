@@ -50,6 +50,7 @@
 *.sqlite
 *.ipynb_checkpoints
 *.pytest_cache
+*nohup.out
 
 # OS generated files #
 ######################
