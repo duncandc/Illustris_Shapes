@@ -30,7 +30,7 @@ def main():
         dm_only=False
 
     if sim[:3] == 'TNG':
-        base_url = "http://www.tng-project.org/api/" + sim + "/ 
+        base_url = "http://www.tng-project.org/api/" + sim + "/"
     else:
         base_url = "http://www.illustris-project.org/api/" + sim + "/"
     snapnum = snapnum.zfill(3)
