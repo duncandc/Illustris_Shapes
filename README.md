@@ -49,6 +49,17 @@ All galaxy and halo shapes are determined by calculating an inertia tensor for a
 Note that in order to run these scripts, you must have the required particle data downloaded on to your disk.  The location of this data for each simulation is set in the `simulation_props.py` file as the `basePath` key in each dictionary.  Scripts to download particle data are stored in the `./data/` directory.
 
 
+## Galaxy Circularity
+
+For each sample for which galaxy shapes are calculated, I also calculate the specific angular momentum and circularity for galaxies.  This is calcuated using the `calculate_galaxy_circularity.py` script using the same positional arguments as the shape scripts described above.  
+
+The specific angular momentum for galaxies is calculated using all star particles (excluding wind particles) within two times the stellar half-mass radius.  Again, the center of a galaxy is taken to be the most bound particle within the subfind subhalo, regardless of particle type.  I record the magnitude and direction of each galaxies specific angular momentum.  
+
+In addition, the circularity is calculated for each stellar particle.  See [Scannapieco et al. (2009)](https://arxiv.org/abs/0812.0976) for details of the calculation.  Briefly, I calculate the component of a galaxy's a stellar particle's angular momentum aligned with the global angular momentum axis.  This is compared to that of a particle on a circular orbit.  Particles with high circularity (e>0.7) are considered disk stars.  I record the fraction of stellar mass in a disk component.  
+
+The resulting circularity catalogs are saved in the `./data/shape_catalogs/` directory.  
+
+
 ## Data
 
 This project uses a large amount of particle data available on the Illustris data access webpage.  Scripts to efficiently download the required data are available in the `./data` directory.
