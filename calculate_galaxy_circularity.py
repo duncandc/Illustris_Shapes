@@ -295,7 +295,6 @@ def main():
     Lz = np.zeros(Ngals)
     f_disk = np.zeros(Ngals)
 
-    Ngals = 100
     for i in tqdm(range(Ngals)):
         gal_id = gal_ids[i]
         f, vec = galaxy_circularity(gal_id, basePath, snapNum, Lbox, num_r_half)
