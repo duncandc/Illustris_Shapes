@@ -60,7 +60,7 @@ For each sample for which galaxy shapes are calculated, I also calculate the spe
 
 *  `calculate_galaxy_circularity.py`
 
-Similarly to the shape caclulations, to calculate galaxy shapes for the Illustris-1 simulation at z=0 (snapshot 135) using particles within 10 times the stellar half-mass rwadius, you would execute the following command:
+Similarly to the shape caclulations, to calculate circularity properties for the Illustris-1 simulation at z=0 (snapshot 135) using particles within 10 times the stellar half-mass radius, you would execute the following command:
 
 ```
 $user: python calculate_galaxy_circularlity.py Illustris-1 135 10.0
