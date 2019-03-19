@@ -15,6 +15,9 @@ from inertia_tensors import inertia_tensors, reduced_inertia_tensors, iterative_
 
 from simulation_props import sim_prop_dict
 
+# progress bar
+from tqdm import tqdm
+
 
 def format_particles(center, coords, Lbox):
     """
@@ -158,7 +161,7 @@ def main():
     litte_h = d['litte_h']
     Lbox = d['Lbox']
 
-    # make galaxy selection
+    # make haloselection
     min_num_ptcls = 1000
     mask, halo_ids = halo_selection(min_num_ptcls, basePath, snapNum)
 
@@ -177,7 +180,8 @@ def main():
     cv = np.zeros((Nhaloes,3))
 
     # loop over the list of galaxy IDs
-    for i, halo_id in enumerate(halo_ids):
+    for i in tqdm(range(Nhaloes)):
+        halo_id = halo_ids[i]
         evals, evecs = halo_shape(halo_id, basePath, snapNum, Lbox, shape_type=shape_type)
         a[i] = evals[2]
         b[i] = evals[1]
@@ -185,8 +189,6 @@ def main():
         av[i,:] = evecs[:,2]
         bv[i,:] = evecs[:,1]
         cv[i,:] = evecs[:,0]
-        percent_remaining = (1.0-1.0*i/Nhaloes)*100
-        print("{0:.2f} % of haloes remaining...".format(percent_remaining))
 
     # save measurements
     fpath = './data/shape_catalogs/'
