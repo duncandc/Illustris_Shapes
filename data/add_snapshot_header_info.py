@@ -4,6 +4,7 @@ adds information to header of snapshot files
 
 import h5py
 import sys
+import os
 
 base_savepath = "/Volumes/G-RAID/simulations/unprocessed/Illustris/"
 
@@ -25,7 +26,7 @@ def main():
         savepath = base_savepath + sim_name + "/" + "snapdir_" + snapnum + "/"
     
     # get list of snapshot files
-    filenames = listdir(savepath)
+    filenames = os.listdir(savepath)
 
     part_types = [0,1,2,3,4,5]
 
