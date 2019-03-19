@@ -35,7 +35,7 @@ def main():
     	if filename[-4:]=='hdf5':
     		f = h5py.File(savepath + filename, 'r')
 
-    		num_ptcls_type = np.zeros(5, dtype=int32)
+    		num_ptcls_type = np.zeros(5, dtype='int32')
     		for part_type in part_types:
     			try:
     			    x = f['PartType'+str(part_type)]
