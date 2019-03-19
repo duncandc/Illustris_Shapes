@@ -3,6 +3,7 @@
 This is a project to measure galaxy and halo shapes/orientations in the Illustris Simulations.
 
 ![](./notebooks/figures/demo_shapes.png)
+*Figure: Five example galaxies from Illustris-1.  The stellar density has been projected along the intermediate axis, shown using a log-scale. The primary axis has been aligned with the x-axis, the minor with the y-axis, and the scale normalized by the stellar half-mass radius.  The white dotted circle indicates twice the stellar half-mass radius.  The projection of the 3-D ellipsoid determined using the iterative reduced inertia tensor is shown as a red ellipse.*
 
 ## Requirements
 
@@ -12,9 +13,6 @@ This project requires the following Python packages installed:
 * [astropy](http://www.astropy.org)
 * [inertia_tensors](https://github.com/duncandc/inertia_tensors/edit/master/README.md)
 * [illustris_python](https://bitbucket.org/illustris/illustris_python)
-
-
-## Galaxy & Halo Shapes
 
 Currently, I calculate galaxy and halo shapes for the following simulations:
 
@@ -26,6 +24,13 @@ Currently, I calculate galaxy and halo shapes for the following simulations:
 	* z=0.0 (snapshot 135)
 	* z=0.6 (snapshot 099)
 	* z=1.0 (snapshot 085)
+* TNG300-1
+	* z=0.0 (snapshot 099)
+* TNG100-1
+	* z=0.0 (snapshot 099)
+
+
+## Galaxy & Halo Shapes
 
 Galaxy shapes are calculated for galaxies with a stellar mass within two times the stellar half-mass radius of at least log(Mstar)>= 9 + log(h), using all stellar particles (excluding wind particles) that are within two times the stellar half-mass radius.  The center of a galaxy is taken to be the most bound particle within the subfind subhalo, regardless of particle type.
 
@@ -51,13 +56,21 @@ Note that in order to run these scripts, you must have the required particle dat
 
 ## Galaxy Circularity
 
-For each sample for which galaxy shapes are calculated, I also calculate the specific angular momentum and circularity for galaxies.  This is calcuated using the `calculate_galaxy_circularity.py` script using the same positional arguments as the shape scripts described above.  
+For each sample for which galaxy shapes are calculated, I also calculate the specific angular momentum and circularity for galaxies.  This is calcuated using:
 
-The specific angular momentum for galaxies is calculated using all star particles (excluding wind particles) within two times the stellar half-mass radius.  Again, the center of a galaxy is taken to be the most bound particle within the subfind subhalo, regardless of particle type.  I record the magnitude and direction of each galaxies specific angular momentum.  
+*  `calculate_galaxy_circularity.py`
 
-In addition, the circularity is calculated for each stellar particle.  See [Scannapieco et al. (2009)](https://arxiv.org/abs/0812.0976) for details of the calculation.  Briefly, I calculate the component of a galaxy's a stellar particle's angular momentum aligned with the global angular momentum axis.  This is compared to that of a particle on a circular orbit.  Particles with high circularity (e>0.7) are considered disk stars.  I record the fraction of stellar mass in a disk component.  
+Similarly to the shape caclulations, to calculate galaxy shapes for the Illustris-1 simulation at z=0 (snapshot 135) using particles within 10 times the stellar half-mass rwadius, you would execute the following command:
+
+```
+$user: python calculate_galaxy_circularlity.py Illustris-1 135 10.0
+```
 
 The resulting circularity catalogs are saved in the `./data/shape_catalogs/` directory.  
+  
+The specific angular momentum for galaxies is calculated using all star particles (excluding wind particles) within two times the stellar half-mass radius.  Again, the center of a galaxy is taken to be the most bound particle within the subfind subhalo, regardless of particle type.  The magnitude and direction of the specific angular momentum for ewach galaxy is recorded.
+
+In addition, the circularity is calculated for each stellar particle within a galaxy (within the spceidifed radius).  See [Scannapieco et al. (2009)](https://arxiv.org/abs/0812.0976) for details of the calculation.  Briefly, for each star particle within a galaxy, the specific angular momentum is compared to that of a particle on a circular orbit aligned with the total angular momentum vector of the stellar component of the galaxy-- the ratio is the circularlity, e.  Particles with high circularity (e>0.7) are considered disk stars, although this threshold is somehwat arbitrary.  The fraction of stellar mass that passes this threshold is recorded as the disk fraction.  
 
 
 ## Data
