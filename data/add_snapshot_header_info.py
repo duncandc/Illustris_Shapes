@@ -28,10 +28,10 @@ def main():
         savepath = base_savepath + sim_name + "/" + "snapdir_" + snapnum + "/"
     
     # get list of snapshot files
-    #filenames = os.listdir(savepath)
+    filenames = os.listdir(savepath)
 
     # test filenames
-    filenames = ['snap_099.0.hdf5']
+    #filenames = ['snap_099.0.hdf5']
 
     part_types = [0,1,2,3,4,5]
 
