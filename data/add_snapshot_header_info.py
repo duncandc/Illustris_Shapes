@@ -54,10 +54,10 @@ def main():
 
     		# add/replce header entry for 'NumPart_ThisFile' 
     		try:
-    			f['Header'].attrs['NumPart_ThisFile']
-    			print('header item `NumPart_ThisFile` already exists.')
+    		    f['Header'].attrs['NumPart_ThisFile']
+    		    print('header item `NumPart_ThisFile` already exists.')
     		except KeyError: 
-    			print('adding header item `NumPart_ThisFile`')
+    		    print('adding header item `NumPart_ThisFile`')
     		    f['Header'].attrs['NumPart_ThisFile'] = num_ptcls_type
 
 
