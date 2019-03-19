@@ -23,7 +23,13 @@ d_2 = {'basePath': '/Volumes/G-RAID/simulations/unprocessed/Illustris/TNG300-1/o
        }
 
 d_3 = {'basePath': '/Volumes/G-RAID/simulations/unprocessed/Illustris/TNG100-1/output',
-       'm_dm': 5.1*10**6.0,
+       'm_dm': 0.000505574296436975*10**10,
+       'litte_h': 0.6774,
+       'Lbox': np.array([75.0]*3)
+       }
+
+d_3_dmo = {'basePath': '/Volumes/G-RAID/simulations/unprocessed/Illustris/TNG100-1-Dark/output',
+       'm_dm': 0.000599968882709879*10**10,
        'litte_h': 0.6774,
        'Lbox': np.array([75.0]*3)
        }
@@ -31,4 +37,5 @@ d_3 = {'basePath': '/Volumes/G-RAID/simulations/unprocessed/Illustris/TNG100-1/o
 sim_prop_dict = {'Illustris-1': d_1,
                  'Illustris-1-Dark': d_1_dmo,
                  'TNG300-1': d_2,
-                 'TNG100-1': d_3}
+                 'TNG100-1': d_3,
+                 'TNG100-1-Dark': d_3_dmo}
