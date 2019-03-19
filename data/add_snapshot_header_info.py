@@ -5,6 +5,7 @@ adds information to header of snapshot files
 import h5py
 import sys
 import os
+import numpy as np
 
 base_savepath = "/Volumes/G-RAID/simulations/unprocessed/Illustris/"
 
