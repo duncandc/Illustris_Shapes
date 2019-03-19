@@ -2,6 +2,7 @@
 adds information to header of snapshot files
 """
 
+from __future__ import print_function
 import h5py
 import sys
 import os
@@ -27,13 +28,16 @@ def main():
         savepath = base_savepath + sim_name + "/" + "snapdir_" + snapnum + "/"
     
     # get list of snapshot files
-    filenames = os.listdir(savepath)
+    #filenames = os.listdir(savepath)
+
+    # test filenames
+    filenames = ['snap_099.0.hdf5']
 
     part_types = [0,1,2,3,4,5]
 
     for filename in filenames:
     	if filename[-4:]=='hdf5':
-    		f = h5py.File(savepath + filename, 'r')
+    		f = h5py.File(savepath + filename, 'r+')
 
     		num_ptcls_type = np.zeros(5, dtype='int32')
     		for part_type in part_types:
@@ -49,7 +53,12 @@ def main():
     		print(filename, num_ptcls_type)
 
     		# add/replce header entry for 'NumPart_ThisFile' 
-    		#f['Header']['NumPart_ThisFile'] = num_ptcls_type
+    		try:
+    			f['Header'].attrs['NumPart_ThisFile']
+    			print('header item `NumPart_ThisFile` already exists.')
+    		except KeyError: 
+    			print('adding header item `NumPart_ThisFile`')
+    		    f['Header'].attrs['NumPart_ThisFile'] = num_ptcls_type
 
 
 
