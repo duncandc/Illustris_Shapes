@@ -28,6 +28,8 @@ Currently, I calculate galaxy and halo shapes for the following simulations:
 	* z=0.0 (snapshot 099)
 * TNG100-1
 	* z=0.0 (snapshot 099)
+* TNG100-1-Dark
+	* z=0.0 (snapshot 099)
 
 
 ## Galaxy & Halo Shapes
@@ -70,12 +72,12 @@ The resulting circularity catalogs are saved in the `./data/shape_catalogs/` dir
   
 The specific angular momentum for galaxies is calculated using all star particles (excluding wind particles) within two times the stellar half-mass radius.  Again, the center of a galaxy is taken to be the most bound particle within the subfind subhalo, regardless of particle type.  The magnitude and direction of the specific angular momentum for ewach galaxy is recorded.
 
-In addition, the circularity is calculated for each stellar particle within a galaxy (within the spceidifed radius).  See [Scannapieco et al. (2009)](https://arxiv.org/abs/0812.0976) for details of the calculation.  Briefly, for each star particle within a galaxy, the specific angular momentum is compared to that of a particle on a circular orbit aligned with the total angular momentum vector of the stellar component of the galaxy-- the ratio is the circularlity, e.  Particles with high circularity (e>0.7) are considered disk stars, although this threshold is somehwat arbitrary.  The fraction of stellar mass that passes this threshold is recorded as the disk fraction.  
+In addition, the circularity is calculated for each stellar particle within a galaxy (within the specified radius).  See [Scannapieco et al. (2009)](https://arxiv.org/abs/0812.0976) for details of the calculation.  Briefly, for each star particle within a galaxy, the specific angular momentum is compared to that of a particle on a circular orbit aligned with the total angular momentum vector of the stellar component of the galaxy--the ratio is the circularlity.  Particles with high circularity (e>0.7) are considered disk stars, although this threshold is somewhat arbitrary.  The fraction of stellar mass that passes this threshold is recorded as the 'disk fraction'.  
 
 
 ## Data
 
-This project uses a large amount of particle data available on the Illustris data access webpage.  Scripts to efficiently download the required data are available in the `./data` directory.
+This project uses a large amount of particle data (multiple Tb) available on the Illustris data access webpage.  Scripts to efficiently download the required data are available in the `./data` directory.
 
 The data products created by this project are stored in the `./data` directory. 
 

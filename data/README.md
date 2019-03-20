@@ -63,12 +63,13 @@ Note that the offsets are downloaded as a seperate file for Illustris TNG.
 
 ## Notes
 
-checksums can be run on the data on Macs using the default shasum program by executing the following command in the directory storing the files.  
+Checksums can be run on the halo catlogs (or any data downlaoded directly from the Illustris data access webpage which also provides the checksums) on Macs using the default shasum program by executing the following command in the directory storing the files.  
 
 ```
 shasum -a 256 -c checksums.txt
 ```
 
+There are no checksums for sub-samples of snapshots.  Running the  `add_snapshot_header_info.py` script will usually throw an error if the files are corrupted (it doesnt do anything if the header info already exists).   
 
 Git will ignore changes to `credentials.py`.  This was accomplished with the following command:
 
