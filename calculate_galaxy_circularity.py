@@ -27,6 +27,8 @@ G = G.to('Mpc km^2/(Msun s^2)').value
 # progress bar
 from tqdm import tqdm
 
+import time
+
 
 def specific_angular_momentum(x, v, m):
     """
@@ -145,7 +147,7 @@ def format_particles(center, coords, Lbox):
     return coords
 
 
-def particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True, num_r_half=10):
+def particle_selection(gal_id, ptcl_coords, galaxy_table, basePath, snapNum, radial_mask=True, num_r_half=10):
     """
     Apply the selection criteria to galaxy particles
 
@@ -160,7 +162,7 @@ def particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True,
     star_mask = (sf_time>=0.0) # don't use wind particles
 
     # get the half mass radius
-    gal_rhalfs = loadSubhalos(basePath, snapNum, fields=['SubhaloHalfmassRadType'])[:,4]/1000.0
+    gal_rhalfs = galaxy_table['SubhaloHalfmassRadType'][:,4]/1000.0
     gal_rhalf = gal_rhalfs[gal_id]
 
     # use only particles within 2 * R_half
@@ -173,13 +175,13 @@ def particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True,
     return (radial_mask) & (star_mask)
 
 
-def galaxy_center(gal_id, basePath, snapNum):
+def galaxy_center(gal_id, galaxy_table):
     """
     Return the coordinates of the center of the galaxy
     """
 
     # load position of the most bound particle (of any type)
-    coords = loadSubhalos(basePath, snapNum, fields=['SubhaloPos'])/1000.0
+    coords = galaxy_table['SubhaloPos']/1000.0
     coord = coords[gal_id]
 
     return coord
@@ -220,7 +222,7 @@ def format_velocities(ptcl_vels, ptcl_masses, basePath, snapNum):
     return ptcl_vels
 
 
-def galaxy_circularity(gal_id, basePath, snapNum, Lbox, num_r_half):
+def galaxy_circularity(gal_id, galaxy_table, basePath, snapNum, Lbox, num_r_half):
     """
     Parameters
     ----------
@@ -240,7 +242,7 @@ def galaxy_circularity(gal_id, basePath, snapNum, Lbox, num_r_half):
     """
 
     # choose a 'center' for each galaxy
-    gal_position = galaxy_center(gal_id, basePath, snapNum)
+    gal_position = galaxy_center(gal_id, galaxy_table)
 
     # load stellar particle positions and masses
     ptcl_coords = loadSubhalo(basePath, snapNum, gal_id, 4, fields=['Coordinates'])/1000.0
@@ -253,7 +255,8 @@ def galaxy_circularity(gal_id, basePath, snapNum, Lbox, num_r_half):
     # use center of mass velocity to subtract bulk velocity
     ptcl_vels = format_velocities(ptcl_vels, ptcl_masses, basePath, snapNum)
 
-    ptcl_mask = particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True, num_r_half=num_r_half)
+    # use a subset of particles
+    ptcl_mask = particle_selection(gal_id, ptcl_coords, galaxy_table, basePath, snapNum, radial_mask=True, num_r_half=num_r_half)
 
     # specific angular momentum of the system
     L = specific_angular_momentum(ptcl_coords[ptcl_mask], ptcl_vels[ptcl_mask], ptcl_masses[ptcl_mask])
@@ -290,6 +293,10 @@ def main():
     Ngals = len(gal_ids)
     print("number of galaxies in selection: {0}".format(Ngals))
 
+    # load galaxy table
+    fields = ['SubhaloGrNr', 'SubhaloMassInRadType', 'SubhaloPos', 'SubhaloHalfmassRadType']
+    galaxy_table = loadSubhalos(basePath, snapNum, fields=fields)
+
     Lx = np.zeros(Ngals)
     Ly = np.zeros(Ngals)
     Lz = np.zeros(Ngals)
@@ -297,7 +304,7 @@ def main():
 
     for i in tqdm(range(Ngals)):
         gal_id = gal_ids[i]
-        f, vec = galaxy_circularity(gal_id, basePath, snapNum, Lbox, num_r_half)
+        f, vec = galaxy_circularity(gal_id, galaxy_table, basePath, snapNum, Lbox, num_r_half)
         f_disk[i] = f
         Lx[i] = vec[0]
         Ly[i] = vec[1]
