@@ -32,7 +32,7 @@ def galaxy_selection(min_mstar, basePath, snapNum):
 
 def main():
 
-	if len(sys.argv)>1:
+    if len(sys.argv)>1:
         sim_name = sys.argv[1]
         snapNum = int(sys.argv[2])
     else:
