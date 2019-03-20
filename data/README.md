@@ -22,6 +22,12 @@ $user: python download_ptcl_data.py Illustris-1 135
 
 All particle data sets used in this project can be downloaded by running the `download_all_ptcl_data.sh` script. 
 
+The Illustris TNG snapshots downloaded using the `download_ptcl_data.py` script are missing some header information.  In this case, you need to run the `add_snapshot_header_info.py` script for each snapshot.  For example, this script can be run as:
+
+```
+$user: python add_snapshot_header_info.py TNG100-1 99
+``` 
+
 
 ### Halo Catalogs
 
@@ -34,7 +40,7 @@ There is a publicaly available shape catalog for Illustris-1 from [Genel et al. 
 
 ## Directory Structure
 
-The Illustris data should be stored within a specific directory structure in roder for the convenience function in [illustris_python](https://bitbucket.org/illustris/illustris_python) to function.  The structures are slightly different for OG and TNG Illustris.
+The Illustris data should be stored within a specific directory structure in order for the convenience functions in [illustris_python](https://bitbucket.org/illustris/illustris_python) to function.  The structures are slightly different for OG and TNG Illustris.
 
 For TNG simulations:
 

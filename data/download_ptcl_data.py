@@ -62,6 +62,7 @@ def main():
 
         dt = time.time()-inner_start
         n_remaining = n_snaps-i-1  # number of files left to download
+        print("snapshot-"+str(snapnum).zfill(3)+"." + str(i) + ".hdf5")
         print(i, "estimated time remaining: {0} hours".format(n_remaining*dt/60.0/60.0))
 
     print("     ")
