@@ -209,7 +209,7 @@ def format_velocities(ptcl_vels, ptcl_masses, basePath, snapNum):
     """
 
     # scale to get peculiar velocity
-    header = loadHeader(basePath, 135)
+    header = loadHeader(basePath, snapNum)
     scale_factor = header['Time']
     ptcl_vels = ptcl_vels*np.sqrt(scale_factor)
 
