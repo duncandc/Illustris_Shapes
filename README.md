@@ -26,6 +26,8 @@ Currently, I calculate galaxy and halo shapes for the following simulations:
 	* z=1.0 (snapshot 085)
 * TNG300-1
 	* z=0.0 (snapshot 099)
+* TNG300-1-Dark
+	* z=0.0 (snapshot 099)
 * TNG100-1
 	* z=0.0 (snapshot 099)
 * TNG100-1-Dark
@@ -73,6 +75,23 @@ The resulting circularity catalogs are saved in the `./data/shape_catalogs/` dir
 The specific angular momentum for galaxies is calculated using all star particles (excluding wind particles) within two times the stellar half-mass radius.  Again, the center of a galaxy is taken to be the most bound particle within the subfind subhalo, regardless of particle type.  The magnitude and direction of the specific angular momentum for ewach galaxy is recorded.
 
 In addition, the circularity is calculated for each stellar particle within a galaxy (within the specified radius).  See [Scannapieco et al. (2009)](https://arxiv.org/abs/0812.0976) for details of the calculation.  Briefly, for each star particle within a galaxy, the specific angular momentum is compared to that of a particle on a circular orbit aligned with the total angular momentum vector of the stellar component of the galaxy--the ratio is the circularlity.  Particles with high circularity (e>0.7) are considered disk stars, although this threshold is somewhat arbitrary.  The fraction of stellar mass that passes this threshold is recorded as the 'disk fraction'.  
+
+
+## Halo Catalogs
+
+Illustris provides "full physics" and dark matter only (DMO) versions of all the available simulations.  This project uses both full physics and DMO simulations.  Halo catalogs are built for the DMO simualtions using the `make_halo_catalog.py` script.  This script builds a simple, value added, flat formatted catalog of halo properties. 
+
+```
+$user: python match_haloes.py Illustris-1-Dark 135
+```   
+
+Illustris proivides mathcing between (sub-)haloes in full physics and DMO runs for a subset of simulations, described [here](http://www.illustris-project.org/data/docs/specifications/#sec4d).  Since this project only requires host halo matching, we preform this matching ourselves for all simulations using the `match_haloes.py` script.  This script finds the nearest neighbor to each host halo in a full phjysics run into a DMO run.  The location of the halo is taken to be the location of the most bound particle, `GroupPos`, in the parlance of the Illustris [group catalogs](http://www.illustris-project.org/data/docs/specifications/#sec2a).  For example, to find matches between Illustris-1 and Illustris-1-Dark z=0 catalogs:
+
+```
+$user: python match_haloes.py Illustris-1 135
+```    
+
+Note that to run these scripts, you must have the "groupcat" files downloaded for the requested snapshot from the Illustris data access page.
 
 
 ## Data
