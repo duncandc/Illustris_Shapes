@@ -8,7 +8,7 @@ import sys
 import os
 import numpy as np
 
-base_savepath = "/Volumes/G-RAID/simulations/unprocessed/Illustris/"
+from Illustris_Shapes.project_settings import base_savepath
 
 def main():
 
@@ -19,14 +19,14 @@ def main():
         sim_name = 'TNG100-1'
         snapnum = str(99)
 
-    snapnum = snapnum.zfill(3)  
+    snapnum = snapnum.zfill(3)
 
     # location of data
     if sim_name[:3] == 'TNG':
         savepath = base_savepath + sim_name + "/output/" + "snapdir_" + snapnum + "/"
     else:
         savepath = base_savepath + sim_name + "/" + "snapdir_" + snapnum + "/"
-    
+
     # get list of snapshot files
     filenames = os.listdir(savepath)
 
@@ -46,17 +46,17 @@ def main():
     			    keys = x.keys()
     			except KeyError:
     				keys = []
-    			
+
     			if len(keys)>0:
     				num_ptcls_type[part_type] = len(x[keys[0]])
 
     		print(filename, num_ptcls_type)
 
-    		# add/replce header entry for 'NumPart_ThisFile' 
+    		# add/replce header entry for 'NumPart_ThisFile'
     		try:
     		    f['Header'].attrs['NumPart_ThisFile']
     		    print('header item `NumPart_ThisFile` already exists.')
-    		except KeyError: 
+    		except KeyError:
     		    print('adding header item `NumPart_ThisFile`')
     		    f['Header'].attrs['NumPart_ThisFile'] = num_ptcls_type
 

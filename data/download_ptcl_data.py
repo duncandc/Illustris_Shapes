@@ -6,7 +6,7 @@ import sys
 from utils import get
 import time
 
-base_savepath = "/Volumes/G-RAID/simulations/unprocessed/Illustris/"
+from Illustris_Shapes.project_settings import base_savepath
 
 def main():
 
