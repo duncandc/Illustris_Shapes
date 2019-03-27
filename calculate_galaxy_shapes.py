@@ -70,7 +70,7 @@ def format_particles(center, coords, Lbox):
     return coords
 
 
-def particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True):
+def particle_selection(gal_id, ptcl_coords, galaxy_table, basePath, snapNum, radial_mask=True):
     """
     Apply the selection criteria to galaxy particles
 
@@ -85,7 +85,7 @@ def particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True)
     star_mask = (sf_time>=0.0) # don't use wind particles
 
     # get the half mass radius
-    gal_rhalfs = loadSubhalos(basePath, snapNum, fields=['SubhaloHalfmassRadType'])[:,4]/1000.0
+    gal_rhalfs = galaxy_table['SubhaloHalfmassRadType'][:,4]/1000.0
     gal_rhalf = gal_rhalfs[gal_id]
 
     # use only particles within 2 * R_half
@@ -98,19 +98,19 @@ def particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True)
     return (radial_mask) & (star_mask)
 
 
-def galaxy_center(gal_id, basePath, snapNum):
+def galaxy_center(gal_id, galaxy_table):
     """
     Return the coordinates of the center of the galaxy
     """
 
     # load position of the most bound particle (of any type)
-    coords = loadSubhalos(basePath, snapNum, fields=['SubhaloPos'])/1000.0
+    coords = galaxy_table['SubhaloPos']/1000.0
     coord = coords[gal_id]
 
     return coord
 
 
-def galaxy_shape(gal_id, basePath, snapNum, Lbox, shape_type='reduced'):
+def galaxy_shape(gal_id, galaxy_table, basePath, snapNum, Lbox, shape_type='reduced'):
     """
     Parameters
     ----------
@@ -130,7 +130,7 @@ def galaxy_shape(gal_id, basePath, snapNum, Lbox, shape_type='reduced'):
     """
 
     # choose a 'center' for each galaxy
-    gal_position = galaxy_center(gal_id, basePath, snapNum)
+    gal_position = galaxy_center(gal_id, galaxy_table)
 
     # load stellar particle positions and masses
     ptcl_coords = loadSubhalo(basePath, snapNum, gal_id, 4, fields=['Coordinates'])/1000.0
@@ -141,9 +141,9 @@ def galaxy_shape(gal_id, basePath, snapNum, Lbox, shape_type='reduced'):
 
     # make a selection cut on the particles
     if shape_type=='non-reduced':
-        ptcl_mask = particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True)
+        ptcl_mask = particle_selection(gal_id, ptcl_coords, galaxy_table, basePath, snapNum, radial_mask=True)
     else:
-        ptcl_mask = particle_selection(gal_id, ptcl_coords, basePath, snapNum, radial_mask=True)
+        ptcl_mask = particle_selection(gal_id, ptcl_coords, galaxy_table,  basePath, snapNum, radial_mask=True)
 
     if shape_type == 'reduced':
         I = reduced_inertia_tensors(ptcl_coords[ptcl_mask], ptcl_masses[ptcl_mask])
@@ -207,6 +207,10 @@ def main():
     Ngals = len(gal_ids)
     print("number of galaxies in selection: {0}".format(Ngals))
 
+    # load galaxy table
+    fields = ['SubhaloGrNr', 'SubhaloMassInRadType', 'SubhaloPos', 'SubhaloHalfmassRadType']
+    galaxy_table = loadSubhalos(basePath, snapNum, fields=fields)
+
     # create array to store shape properties
     # eigen values
     a = np.zeros(Ngals)
@@ -220,7 +224,7 @@ def main():
     # loop over the list of galaxy IDs
     for i in tqdm(range(Ngals)):
         gal_id = gal_ids[i]
-        evals, evecs = galaxy_shape(gal_id, basePath, snapNum, Lbox, shape_type=shape_type)
+        evals, evecs = galaxy_shape(gal_id, galaxy_table, basePath, snapNum, Lbox, shape_type=shape_type)
         a[i] = evals[2]
         b[i] = evals[1]
         c[i] = evals[0]

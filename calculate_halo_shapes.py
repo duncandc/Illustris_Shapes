@@ -70,19 +70,19 @@ def format_particles(center, coords, Lbox):
     return coords
 
 
-def halo_center(halo_id, basePath, snapNum):
+def halo_center(halo_id, halo_table):
     """
     Return the coordinates of the center of the galaxy
     """
 
     # load position of the most bound particle (of any type)
-    coords = loadSubhalos(basePath, snapNum, fields=['SubhaloPos'])/1000.0
+    coords = halo_table['SubhaloPos']/1000.0
     coord = coords[halo_id]
 
     return coord
 
 
-def halo_shape(halo_id, basePath, snapNum, Lbox, shape_type='reduced'):
+def halo_shape(halo_id, halo_table, basePath, snapNum, Lbox, shape_type='reduced'):
     """
     Parameters
     ----------
@@ -102,7 +102,7 @@ def halo_shape(halo_id, basePath, snapNum, Lbox, shape_type='reduced'):
     """
 
     # choose a 'center' for each galaxy
-    halo_position = halo_center(halo_id, basePath, snapNum)
+    halo_position = halo_center(halo_id, halo_table)
 
     # load stellar particle positions and masses
     ptcl_coords = loadSubhalo(basePath, snapNum, halo_id, 1, fields=['Coordinates'])/1000.0
@@ -169,6 +169,10 @@ def main():
     Nhaloes = len(halo_ids)
     print("number of haloes in selection: {0}".format(Nhaloes))
 
+    # load galaxy table
+    fields = ['SubhaloGrNr', 'SubhaloPos', ]
+    halo_table = loadSubhalos(basePath, snapNum, fields=fields)
+
     # create array to store shape properties
     # eigen values
     a = np.zeros(Nhaloes)
@@ -182,7 +186,7 @@ def main():
     # loop over the list of galaxy IDs
     for i in tqdm(range(Nhaloes)):
         halo_id = halo_ids[i]
-        evals, evecs = halo_shape(halo_id, basePath, snapNum, Lbox, shape_type=shape_type)
+        evals, evecs = halo_shape(halo_id, halo_table, basePath, snapNum, Lbox, shape_type=shape_type)
         a[i] = evals[2]
         b[i] = evals[1]
         c[i] = evals[0]
