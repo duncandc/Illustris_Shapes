@@ -40,23 +40,39 @@ def main():
     # load full physics catalog
     fields = ['GroupPos', 'GroupMass', 'Group_R_Mean200']
     halo_table_1 = loadHalos(basePath_1, snapNum, fields=fields)
-    host_ids_1 = np.arange(0,len(halo_table_1)).astype('int')
+    host_ids_1 = np.arange(0,len(halo_table_1['GroupMass'])).astype('int')
 
-    # build KD tree
-    coords = halo_table_1['GroupPos']
-    tree = KDTree(coords, boxsize=Lbox)
+    coords_1 = halo_table_1['GroupPos']/1000.0
 
     # load DMO catalog
     fields = ['GroupPos', 'GroupMass']
     halo_table_2 = loadHalos(basePath_2, snapNum, fields=fields)
-    host_ids_2 = np.arange(0,len(halo_table_2)).astype('int')
+    host_ids_2 = np.arange(0,len(halo_table_2['GroupMass'])).astype('int')
 
-    coords = halo_table_2['GroupPos']
+    # build KD tree
+    coords_2 = halo_table_2['GroupPos']/1000.0
+    tree = KDTree(coords_2, boxsize=Lbox)
 
     # query tree for nearest neighbors
-    result = tree.query(coords, k=1, distance_upper_bound=halo_table['Group_R_Mean200'])
-    print(result)
+    r_max = 1.0
+    result = tree.query(coords_1, k=1, distance_upper_bound=r_max)
+    
+    idx = result[1]
+    r = result[0]
 
+    no_match = (idx==len(halo_table_2['GroupMass']))
+    idx[no_match] = -1
+
+    # save table
+    fpath = './data/value_added_catalogs/'
+    fname = sim_name + '_' + str(snapNum) + '_halo_matching.dat'
+    ascii.write([host_ids_1, idx, r],
+                fpath+fname,
+                names=['host_halo_id', 'dmo_host_halo_id', 'r'],
+                overwrite=True)
+
+
+    
 
 
 
