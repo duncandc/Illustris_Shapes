@@ -33,7 +33,7 @@ def main():
     d = sim_prop_dict[sim_name + '-Dark']
     basePath_2 = d['basePath']
     m_dm_2 = d['m_dm']
-    
+
     litte_h = d['litte_h']
     Lbox = d['Lbox']
 
@@ -56,7 +56,7 @@ def main():
     # query tree for nearest neighbors
     r_max = 1.0
     result = tree.query(coords_1, k=1, distance_upper_bound=r_max)
-    
+
     idx = result[1]
     r = result[0]
 
@@ -65,14 +65,14 @@ def main():
 
     # save table
     fpath = './data/value_added_catalogs/'
-    fname = sim_name + '_' + str(snapNum) + '_halo_matching.dat'
+    fname = sim_name + '_' + str(snapNum) + '_host_halo_matches.dat'
     ascii.write([host_ids_1, idx, r],
                 fpath+fname,
                 names=['host_halo_id', 'dmo_host_halo_id', 'r'],
                 overwrite=True)
 
 
-    
+
 
 
 

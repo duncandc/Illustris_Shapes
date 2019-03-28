@@ -21,7 +21,7 @@ def main():
     else:
         sim_name = 'Illustris-1' # full physics high-res run
         snapNum = 135  # z=0
-    
+
     # load simulation properties
     d = sim_prop_dict[sim_name]
     basePath = d['basePath']
@@ -53,7 +53,6 @@ def main():
     host_halo_fof_mass = halo_table['GroupMass']*10**10
 
     central_id = halo_table['GroupFirstSub']
-
 
     # save table
     fpath = './data/value_added_catalogs/'
