@@ -16,12 +16,18 @@ Note that all values in the catalog are scaled to h=1.
 Each catalog is saved in ascii format as space seperated values.  The first row contains the column names:
 
 * `gal_id` : subfind galaxy/subhalo ID 
-* ...
+* `x`,`y`,`z` : position [h^-1 Mpc]
+* `vx`, `vy`, `vz` : peculiar velocity [km/s]
+* `stellar_mass_in_twice_halfrad` : stellar mass within twice the half-mass radius (exclusive of substructure) [h^-1 Msol]
+* `stellar_mass_all` : stellar mass associated with subhalo (exclusive of substructure) [h^-1 Msol]
+* `host_halo_mass_200m` : 200m halo mass [h^-1 Msol]
+* `host_halo_radius_200m` : 200m halo radius [h^-1 Mpc] 
+* `host_halo_fof_mass` : total fof halo mass [h^-1 Msol]
 
 
 ### Halo Matching
 
-crossmatch catalogs of FoF host haloes between full physics and DMO runs
+crossmatched catalogs of FoF host haloes between full physics and DMO runs
 
 The file names are of the form: [simulation name]\_[snapshot number]\_halo_matches.dat
 
