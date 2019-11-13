@@ -7,15 +7,15 @@ import numpy as np
 import sys
 
 # I/O
-from astropy.table import Table, Column
 from astropy.io import ascii
 
 # illustris python functions
-from illustris_python.snapshot import loadHalo, snapPath, loadSubhalo
-from illustris_python.groupcat import gcPath, loadHalos, loadSubhalos, loadHeader
+from illustris_python.snapshot import loadSubhalo
+from illustris_python.groupcat import loadSubhalos, loadHeader
 
 # utilities
-from halotools.utils import normalized_vectors
+from scipy import interpolate
+from rotations.vector_utilities import normalized_vectors
 
 # Illustris simulation properties
 from simulation_props import sim_prop_dict
@@ -27,7 +27,59 @@ G = G.to('Mpc km^2/(Msun s^2)').value
 # progress bar
 from tqdm import tqdm
 
-import time
+def particle_cos_alpha(coords, vels, L):
+    """
+    cosine of the angle between the orbital angular momentum
+    of the particle and that of the galaxy system
+
+    Parameters
+    ----------
+    coords :
+        normalized particle positions
+
+    vels : array_like
+        normalized particle velocities
+
+    L : array_like
+        array of 3D angular momentum vector
+
+    Returns
+    -------
+    cos_alpha : array_like
+       array of cosine(alpha) values
+    """
+
+    # specific angular momomentum of particles
+    j = normalized_vectors(np.cross(coords, vels))
+    l = normalized_vectors(L)[0]
+
+    return np.dot(j, l)
+
+
+def particle_cos_beta(coords, L):
+    """
+    cosine of the angle between the radial vector
+    and the spin axis of the galaxy
+
+    Parameters
+    ----------
+    coords :
+        normalized particle positions
+
+    L : array_like
+        array of 3D angular momentum vector
+
+    Returns
+    -------
+    cos_alpha : array_like
+       array of cosine(alpha) values
+    """
+
+    # specific angular momomentum of particles
+    r = normalized_vectors(coords)
+    l = normalized_vectors(L)[0]
+
+    return np.dot(r, l)
 
 
 def specific_angular_momentum(x, v, m):
@@ -53,42 +105,154 @@ def specific_angular_momentum(x, v, m):
     return (m[:,np.newaxis]*np.cross(x,v)).sum(axis=0)/m.sum()
 
 
-def disk_fraction(coords, vels, masses, L, e_thresh=0.7):
+def disk_fraction(masses, epsilons, disk_threshold):
     """
-    fraction of stars oin disk
+    mass fraction of particles in disk
+
+    Parameters
+    ----------
+    masses : array_like
+        array of particle masses
+
+    epsilons : array_like
+        array of particle circularities
+
+    disk_threshold : float
+        circulalrity threshold for disk
+
+    Returns
+    -------
+    f_disk : float
+        fraction of mass in disk
     """
 
-    # circulatiry parameter
-    epsilon = circularity(coords, vels, masses, L)
-
-    mask = (epsilon>=e_thresh)
+    # define disk particles as those where epsilon > e_thresh
+    mask = (epsilons >= disk_threshold)
 
     return np.sum(masses[mask])/np.sum(masses)
 
 
-def circularity(coords, vels, masses, L):
+def circular_velocity(r, coords, masses):
     """
-    circularity parameter
+    circular velocity at radial position r
+
+    Parmaters
+    ---------
+    r : array_like
+        radial positions
+
+    coords : array_like
+        array of massive particle coordinates (centered on the galaxy)
+
+    masses : array_like
+        array of massive particle masses
+
+    Returns
+    -------
+    v_circ : array_like
+        array of circular velocities
     """
 
-    r = np.sqrt(np.sum(coords*coords, axis=-1))
-    r_sort_inds = np.argsort(r)
+    # radial position of massive particles
+    ptcl_r = np.sqrt(np.sum(coords*coords, axis=-1))
 
-    r = r[r_sort_inds]
-    coords = coords[r_sort_inds]
-    vels = vels[r_sort_inds]
+    # sort by radial position
+    r_sort_inds = np.argsort(ptcl_r)
+    ptcl_r = ptcl_r[r_sort_inds]
     masses = masses[r_sort_inds]
 
     # mass internal to r
     m_within_r = np.cumsum(masses)
 
+    # circular velocity
+    vc = np.sqrt(G*m_within_r/ptcl_r)
+
+    # interpolate circular velocity curve
+    f = interpolate.interp1d(ptcl_r, vc, kind='linear', fill_value='extrapolate')
+
+    return f(r)
+
+
+def loadSubhaloAll(basePath, snapNum, gal_id, field, m_dm=None):
+    """
+    Load particles/cells (of all types) for a single field.
+
+    Parameters
+    ----------
+    basePath :
+
+    snapNum :
+
+    gal_id : int
+
+    field : string
+
+    m_dm : float
+        dark matter particle mass
+
+    Returns
+    -------
+    result : numpy.array
+
+    Notes
+    -----
+    This is a simple wrapper around the illustris_python.loadSubhalo() function.
+    """
+
+    ptypes = [0,1,4,5]
+
+    # must hard code in various behaviour for different fields
+    fields = ['Coordinates', 'Masses']
+    if field not in fields:
+        msg = ('field must be one of:', fields)
+        raise ValueError(msg)
+
+    # since all dm particle masses are the same,
+    # this quantity isn't stored in the table.
+    if (field=='Masses') & (m_dm is None):
+        msg = ('dm particle mass must be passed if field==Masses')
+        raise ValueError(msg)
+
+    data = []
+    for ptype in ptypes:
+
+        # create dm mass array
+        if (ptype==1) & (field=='Masses'):
+            x = loadSubhalo(basePath, snapNum, gal_id, ptype, fields=['ParticleIDs'])
+            # if no particles are found, loadSubhalo returns {'count': 0}
+            if type(x) is dict:
+                x = []
+            x = np.array([m_dm]*len(x), dtype='float32')/10.0**10
+        else:
+            x = loadSubhalo(basePath, snapNum, gal_id, ptype, fields=[field])
+
+        # if no particles are found, loadSubhalo returns {'count': 0}
+        if type(x) is dict:
+            pass
+        else:
+            data.append(x)
+
+    if field in [fields[1]]:
+        return np.hstack(tuple(data))
+    else:
+        return np.vstack(tuple(data))
+
+
+def circularity(coords, vels, masses, v_circs, L):
+    """
+    circularity parameter
+    """
+
+    r = np.sqrt(np.sum(coords*coords, axis=-1))
+
     # specific angular momentum of a circular orbit at r
-    j_circ = r*np.sqrt(G*m_within_r/r)
+    j_circ = r*v_circs
 
     # specific angular momomentum of particles
-    j = np.cross(coords,vels)
+    j = np.cross(coords, vels)
+
     # component along system angular momentum vector
-    j_z = np.dot(j,L/np.sqrt(np.sum(L*L,axis=-1)))
+    j_z = np.dot(j, L/np.sqrt(np.sum(L*L, axis=-1)))
 
     # circulatiry parameter
     epsilon = j_z/j_circ
@@ -98,7 +262,7 @@ def circularity(coords, vels, masses, L):
 
 def format_particles(center, coords, Lbox):
     """
-    center the partivcle coordinates on (0,0,0) and account for PBCs
+    center the particle coordinates on (0,0,0) and account for PBCs
 
     Parameters
     ----------
@@ -222,7 +386,7 @@ def format_velocities(ptcl_vels, ptcl_masses, basePath, snapNum):
     return ptcl_vels
 
 
-def galaxy_circularity(gal_id, galaxy_table, basePath, snapNum, Lbox, num_r_half):
+def galaxy_circularity(gal_id, galaxy_table, basePath, snapNum, Lbox, num_r_half, m_dm):
     """
     Parameters
     ----------
@@ -249,20 +413,34 @@ def galaxy_circularity(gal_id, galaxy_table, basePath, snapNum, Lbox, num_r_half
     ptcl_vels = loadSubhalo(basePath, snapNum, gal_id, 4, fields=['Velocities'])
     ptcl_masses = loadSubhalo(basePath, snapNum, gal_id, 4, fields=['Masses'])*10.0**10
 
+    # load all particles positions and masses
+    all_ptcl_coords = loadSubhaloAll(basePath, snapNum, gal_id, field='Coordinates')/1000.0
+    all_ptcl_masses = loadSubhaloAll(basePath, snapNum, gal_id, field='Masses', m_dm=m_dm)*10.0**10
+
     # center and account for PBCs
     ptcl_coords = format_particles(gal_position, ptcl_coords, Lbox)
+    all_ptcl_coords = format_particles(gal_position, all_ptcl_coords, Lbox)
 
     # use center of mass velocity to subtract bulk velocity
     ptcl_vels = format_velocities(ptcl_vels, ptcl_masses, basePath, snapNum)
 
-    # use a subset of particles
+    # use a subset of particles for stellar properties
     ptcl_mask = particle_selection(gal_id, ptcl_coords, galaxy_table, basePath, snapNum, radial_mask=True, num_r_half=num_r_half)
 
-    # specific angular momentum of the system
+    # specific angular momentum of the stellar system (use selected disk stars)
     L = specific_angular_momentum(ptcl_coords[ptcl_mask], ptcl_vels[ptcl_mask], ptcl_masses[ptcl_mask])
 
-    # fraction of stellar mass with circularity > a threshold
-    f_disk = disk_fraction(ptcl_coords[ptcl_mask], ptcl_vels[ptcl_mask], ptcl_masses[ptcl_mask], L, e_thresh=0.7)
+    # radial position of stellar particles
+    r = np.sqrt(np.sum(ptcl_coords*ptcl_coords, axis=-1))
+
+    # circular velocity at the radial position of stellar particles
+    v_circs = circular_velocity(r, all_ptcl_coords, all_ptcl_masses)
+
+    # circularity parameter for stellar particles
+    epsilons = circularity(ptcl_coords, ptcl_vels, ptcl_masses, v_circs, L)
+
+    # fraction of stellar mass with circularity > a threshold (use selected disk stars)
+    f_disk = disk_fraction(ptcl_masses[ptcl_mask], epsilons[ptcl_mask], disk_threshold=0.7)
 
     return f_disk, L
 
@@ -304,7 +482,7 @@ def main():
 
     for i in tqdm(range(Ngals)):
         gal_id = gal_ids[i]
-        f, vec = galaxy_circularity(gal_id, galaxy_table, basePath, snapNum, Lbox, num_r_half)
+        f, vec = galaxy_circularity(gal_id, galaxy_table, basePath, snapNum, Lbox, num_r_half, m_dm)
         f_disk[i] = f
         Lx[i] = vec[0]
         Ly[i] = vec[1]
